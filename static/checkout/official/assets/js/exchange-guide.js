@@ -202,24 +202,12 @@
         document.body.style.overflow = '';
     }
 
-    function seenKey() { return 'xg_seen_' + ctx.tradeId; }
-
-    // 每个订单首次进入付款页自动弹一次教程，之后只保留横幅入口
-    function autoOpenOnce() {
-        try {
-            if (window.localStorage.getItem(seenKey())) return;
-            window.localStorage.setItem(seenKey(), '1');
-        } catch (e) { /* 存储不可用时照样弹出 */ }
-        open();
-    }
-
     window.ExchangeGuide = {
         mount: function (c) {
             var mountEl = document.getElementById('exchangeGuideMount');
             if (!mountEl || !c || !c.amount || c.amount === '--' || !c.address) return;
             ctx = c;
-            renderBanner(mountEl);
-            autoOpenOnce();
+            renderBanner(mountEl); // 只放横幅，点按钮才弹教程
         },
         open: open,
         close: close

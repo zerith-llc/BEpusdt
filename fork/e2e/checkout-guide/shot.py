@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""收银台交易所提币引导 E2E：打开付款页，断言教程首次自动弹出、二次进入不再弹、横幅与复制按钮带订单金额/地址、币安截图加载成功，并截图。
+"""收银台交易所提币引导 E2E：打开付款页，断言教程不自动弹出、点横幅按钮才弹、横幅与复制按钮带订单金额/地址、币安截图加载成功，并截图。
 
 用法: shot.py <base_url> <trade_id> <out_dir>   （需要一个已选好币种网络、处于待支付状态的订单）
 """
@@ -20,7 +20,13 @@ with sync_playwright() as p:
         amount = page.locator("#payAmountQ").inner_text().split(" ")[0]
         address = page.locator("#walletAddress").inner_text().strip()
         modal = page.get_by_test_id("exchange-guide-modal")
-        expect(modal).to_be_visible()  # 首次进入自动弹出
+        banner = page.get_by_test_id("exchange-guide-banner")
+        expect(banner).to_contain_text(amount)
+        page.wait_for_timeout(500)
+        expect(modal).to_have_count(0)  # 进入付款页不自动弹出
+        page.screenshot(path=f"{out}/{tag}-banner.png", full_page=True)
+        page.locator("#xgOpenBtn").click()
+        expect(modal).to_be_visible()
         expect(modal.locator(f'[data-copy="{amount}"]')).to_have_count(1)
         expect(modal.locator(f'[data-copy="{address}"]')).to_have_count(1)
         shots = modal.get_by_test_id("exchange-guide-shot")
@@ -39,15 +45,7 @@ with sync_playwright() as p:
 
         modal.locator(".xg-got-it").click()
         expect(modal).to_be_hidden()
-        banner = page.get_by_test_id("exchange-guide-banner")
-        expect(banner).to_contain_text(amount)
-        page.screenshot(path=f"{out}/{tag}-banner.png", full_page=True)
-
-        page.reload()  # 同一订单再次进入不再自动弹出，横幅仍在，按钮能重新打开
-        expect(page.get_by_test_id("exchange-guide-banner")).to_be_visible()
-        page.wait_for_timeout(500)
-        expect(modal).to_be_hidden()
-        page.locator("#xgOpenBtn").click()
+        page.locator("#xgOpenBtn").click()  # 关掉后还能再打开
         expect(modal).to_be_visible()
         ctx.close()
     browser.close()
