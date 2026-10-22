@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""收银台交易所提币引导 E2E：打开付款页，断言教程首次自动弹出、二次进入不再弹、横幅与复制按钮带订单金额/地址，并截图。
+"""收银台交易所提币引导 E2E：打开付款页，断言教程首次自动弹出、二次进入不再弹、横幅与复制按钮带订单金额/地址、币安截图加载成功，并截图。
 
 用法: shot.py <base_url> <trade_id> <out_dir>   （需要一个已选好币种网络、处于待支付状态的订单）
 """
@@ -23,10 +23,19 @@ with sync_playwright() as p:
         expect(modal).to_be_visible()  # 首次进入自动弹出
         expect(modal.locator(f'[data-copy="{amount}"]')).to_have_count(1)
         expect(modal.locator(f'[data-copy="{address}"]')).to_have_count(1)
-        expect(page.get_by_test_id("exchange-guide-mock")).to_contain_text(amount)
-        page.wait_for_timeout(400)
+        shots = modal.get_by_test_id("exchange-guide-shot")
+        expect(shots).to_have_count(3)
+        for i in range(3):  # 币安截图都加载成功
+            shots.nth(i).scroll_into_view_if_needed()
+            page.wait_for_function("img => img.complete && img.naturalWidth > 0", arg=shots.nth(i).element_handle())
+        page.locator(".xg-modal-body").evaluate("el => el.scrollTop = 0")
+        page.wait_for_timeout(300)
         page.screenshot(path=f"{out}/{tag}-modal.png")
-        modal.get_by_test_id("exchange-guide-mock").screenshot(path=f"{out}/{tag}-mock.png")
+        # 整个弹窗内容的长图，方便审阅
+        body = page.locator(".xg-modal-body")
+        body.evaluate("el => { el.style.maxHeight = 'none'; el.closest('.xg-modal-card').style.maxHeight = 'none'; el.closest('.modal-overlay').style.position = 'absolute'; }")
+        modal.locator(".xg-modal-card").screenshot(path=f"{out}/{tag}-modal-full.png")
+        body.evaluate("el => { el.style.maxHeight = ''; el.closest('.xg-modal-card').style.maxHeight = ''; el.closest('.modal-overlay').style.position = ''; }")
 
         modal.locator(".xg-got-it").click()
         expect(modal).to_be_hidden()

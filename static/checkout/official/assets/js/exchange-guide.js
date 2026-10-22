@@ -22,27 +22,27 @@
         plasma: 'Plasma'
     };
 
-    // 仅用于示例演算，真实手续费以交易所页面为准
-    var EXAMPLE_FEE = '0.01';
+    var IMG = '/checkout/official/assets/img/exchange-guide/';
 
     var TEXT = {
         zh: {
             bannerTitle: '从币安等交易所提币？请看这里',
             bannerBody: '交易所会从提现数量里扣手续费。必须让「到账数量」正好等于 {amount}，多一分少一分都不会自动到账。',
-            bannerBtn: '查看币安提币教程',
+            bannerTip: '币安用户：金额框填好订单金额后，点一下底部的「到账数量 ⇋」，币安会自动把手续费加上。',
+            bannerBtn: '查看币安提币图文教程',
             modalTitle: '币安提币教程',
-            modalLead: '跟着下面 5 步做，付款会自动到账。',
-            step1: '打开币安 App，进入「资产」→「提现」，选择 <b>{currency}</b>。',
-            step2: '选择「通过加密货币网络发送」（链上提现），<b>不要</b>用「币安用户间转账」或 Binance Pay。粘贴收款地址：',
+            modalLead: '跟着下面 6 步做，付款会自动到账。',
+            step1: '打开币安 App，进入「资产」→「提现」，选择 <b>{currency}</b>，再选「通过加密货币网络发送」（<b>不要</b>用币安用户间转账或 Binance Pay）。',
+            step2: '粘贴收款地址：',
             step3: '网络选择 <b>{binanceNet}</b>。选错网络资金无法找回。',
-            step4: '「提现数量」填 <b>订单金额 + 手续费</b>。币安会从提现数量里扣掉网络手续费，按订单金额原样填写会少到账。',
-            step5: '提交前核对确认页上的「到账数量」，必须<b>正好</b>是：',
-            mockTitle: '币安确认页示例（手续费按 {fee} 演算，以实际页面为准）',
-            mockWithdraw: '提现数量',
-            mockFee: '网络手续费',
-            mockReceive: '到账数量',
-            mockOk: '与订单金额一致',
-            otherExchange: '欧易、Bybit 等其他交易所同理：确认「到账数量」等于订单金额即可。用自己的钱包（TokenPocket、imToken、MetaMask 等）直接转账时，按订单金额原样转出。',
+            step4: '在金额框里填入订单金额。此时底部的「到账数量」会比订单金额少一点（被扣了手续费），<b>点「到账数量」旁边的 ⇋</b>：',
+            step5: '弹出「修改收款金额」，确认里面的「到账数量」就是订单金额，点<b>确认</b>：',
+            step6: '提现数量自动变成「订单金额 + 手续费」，底部「到账数量」正好等于订单金额，这时再点<b>提现</b>：',
+            imgNote: '图中以 10 USDT、手续费 0.01 为例，请以你的订单金额为准。',
+            img1Alt: '填入金额后到账数量少了手续费，点到账数量旁的切换按钮',
+            img2Alt: '修改收款金额弹窗，到账数量等于订单金额，点确认',
+            img3Alt: '提现数量自动加上手续费，到账数量等于订单金额',
+            otherExchange: '欧易、Bybit 等其他交易所同理：提交前确认「到账数量」等于订单金额即可。用自己的钱包（TokenPocket、imToken、MetaMask 等）直接转账时，按订单金额原样转出。',
             copy: '复制',
             copied: '已复制',
             copyFailed: '复制失败',
@@ -51,20 +51,21 @@
         en: {
             bannerTitle: 'Paying from Binance or another exchange?',
             bannerBody: 'Exchanges deduct a withdrawal fee from the amount you enter. The amount received must be exactly {amount}, or the payment will not be credited automatically.',
-            bannerBtn: 'Binance withdrawal guide',
+            bannerTip: 'Binance users: after entering the order amount, tap "Receive amount ⇋" at the bottom and Binance adds the fee for you.',
+            bannerBtn: 'Binance withdrawal guide (with screenshots)',
             modalTitle: 'How to pay from Binance',
-            modalLead: 'Follow these 5 steps and the payment will be credited automatically.',
-            step1: 'Open the Binance app, go to Assets → Withdraw and choose <b>{currency}</b>.',
-            step2: 'Choose "Send via crypto network". Do <b>not</b> use "Send to Binance user" or Binance Pay. Paste the receiving address:',
+            modalLead: 'Follow these 6 steps and the payment will be credited automatically.',
+            step1: 'Open the Binance app, go to Assets → Withdraw, choose <b>{currency}</b>, then "Send via crypto network" (do <b>not</b> use Send to Binance user or Binance Pay).',
+            step2: 'Paste the receiving address:',
             step3: 'Select the network <b>{binanceNet}</b>. Funds sent on the wrong network cannot be recovered.',
-            step4: 'Enter <b>order amount + fee</b> as the withdrawal amount. Binance deducts the network fee from it, so entering the order amount as-is will arrive short.',
-            step5: 'Before submitting, check that "Receive amount" on the confirmation screen is <b>exactly</b>:',
-            mockTitle: 'Example confirmation (fee {fee} for illustration, use the real value shown)',
-            mockWithdraw: 'Amount',
-            mockFee: 'Network fee',
-            mockReceive: 'Receive amount',
-            mockOk: 'Matches the order',
-            otherExchange: 'Other exchanges (OKX, Bybit, …) work the same way: make sure the received amount equals the order amount. When paying from your own wallet (TokenPocket, imToken, MetaMask, …), send the order amount as-is.',
+            step4: 'Enter the order amount. "Receive amount" at the bottom is now slightly lower (the fee is deducted). <b>Tap ⇋ next to "Receive amount"</b>:',
+            step5: 'A dialog shows the new details. Check that "Receive amount" equals the order amount and tap <b>Confirm</b>:',
+            step6: 'The withdrawal amount now includes the fee and "Receive amount" equals the order amount exactly. Tap <b>Withdraw</b>:',
+            imgNote: 'Screenshots use 10 USDT with a 0.01 fee as an example; use your own order amount.',
+            img1Alt: 'After entering the amount, receive amount is short by the fee; tap the switch next to it',
+            img2Alt: 'Dialog where receive amount equals the order amount; tap Confirm',
+            img3Alt: 'Withdrawal amount now includes the fee and receive amount equals the order amount',
+            otherExchange: 'Other exchanges (OKX, Bybit, …) work the same way: make sure the received amount equals the order amount before submitting. When paying from your own wallet (TokenPocket, imToken, MetaMask, …), send the order amount as-is.',
             copy: 'Copy',
             copied: 'Copied',
             copyFailed: 'Copy failed',
@@ -91,20 +92,11 @@
         });
     }
 
-    // 金额加减用整数运算，避免浮点误差；按订单金额的小数位数对齐
-    function addAmount(a, b) {
-        var da = (String(a).split('.')[1] || '').length, db = (String(b).split('.')[1] || '').length;
-        var d = Math.max(da, db), f = Math.pow(10, d);
-        var sum = Math.round(parseFloat(a) * f) + Math.round(parseFloat(b) * f);
-        return (sum / f).toFixed(d);
-    }
-
     function vars() {
         var amount = esc(ctx.amount), currency = esc(ctx.currency);
         return {
             amount: '<b>' + amount + ' ' + currency + '</b>',
             currency: currency,
-            fee: esc(EXAMPLE_FEE + ' ' + ctx.currency),
             binanceNet: esc(BINANCE_NETWORK[String(ctx.network || '').toLowerCase()] || ctx.netName || ctx.network || '')
         };
     }
@@ -141,6 +133,10 @@
             '</div>';
     }
 
+    function shot(name, altKey) {
+        return '<img class="xg-shot" loading="lazy" src="' + IMG + name + '.webp" alt="' + esc(tr(altKey)) + '" data-testid="exchange-guide-shot">';
+    }
+
     function renderBanner(mountEl) {
         var v = vars();
         mountEl.innerHTML =
@@ -149,6 +145,7 @@
             '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>' +
             '<span>' + tr('bannerTitle') + '</span></div>' +
             '<p class="xg-banner-body">' + tr('bannerBody', v) + '</p>' +
+            '<p class="xg-banner-tip">' + tr('bannerTip') + '</p>' +
             '<button type="button" class="xg-banner-btn" id="xgOpenBtn">' + tr('bannerBtn') + ' →</button>' +
             '</div>';
         document.getElementById('xgOpenBtn').addEventListener('click', open);
@@ -156,8 +153,6 @@
 
     function renderModal() {
         var v = vars();
-        var withdraw = addAmount(ctx.amount, EXAMPLE_FEE);
-        var unit = ctx.currency;
         var html =
             '<div class="modal-card xg-modal-card" role="dialog" aria-modal="true" aria-labelledby="xgTitle">' +
             '<div class="xg-modal-head"><h2 id="xgTitle">' + tr('modalTitle') + '</h2>' +
@@ -168,16 +163,11 @@
             '<li>' + tr('step1', v) + '</li>' +
             '<li>' + tr('step2', v) + copyRow(ctx.address, '') + '</li>' +
             '<li>' + tr('step3', v) + '</li>' +
-            '<li>' + tr('step4', v) + '</li>' +
-            '<li>' + tr('step5', v) + copyRow(ctx.amount, unit) +
-            '<div class="xg-mock" data-testid="exchange-guide-mock">' +
-            '<div class="xg-mock-title">' + tr('mockTitle', v) + '</div>' +
-            '<div class="xg-mock-row"><span>' + tr('mockWithdraw') + '</span><span>' + esc(withdraw + ' ' + unit) + '</span></div>' +
-            '<div class="xg-mock-row"><span>' + tr('mockFee') + '</span><span>−' + esc(EXAMPLE_FEE + ' ' + unit) + '</span></div>' +
-            '<div class="xg-mock-row xg-mock-receive"><span>' + tr('mockReceive') + '</span><span>' + esc(ctx.amount + ' ' + unit) + ' ✓</span></div>' +
-            '<div class="xg-mock-ok">' + tr('mockOk') + '</div>' +
-            '</div></li>' +
+            '<li>' + tr('step4', v) + copyRow(ctx.amount, ctx.currency) + shot('step1-enter', 'img1Alt') + '</li>' +
+            '<li>' + tr('step5', v) + shot('step2-confirm', 'img2Alt') + '</li>' +
+            '<li>' + tr('step6', v) + shot('step3-result', 'img3Alt') + '</li>' +
             '</ol>' +
+            '<p class="xg-img-note">' + tr('imgNote') + '</p>' +
             '<p class="xg-other">' + tr('otherExchange') + '</p>' +
             '</div>' +
             '<div class="xg-modal-foot"><button type="button" class="xg-got-it" data-xg-close>' + tr('gotIt') + '</button></div>' +

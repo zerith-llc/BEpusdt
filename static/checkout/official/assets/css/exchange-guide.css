@@ -13,6 +13,15 @@
 .xg-banner-title svg { flex-shrink: 0; }
 .xg-banner-body { margin-top: 6px; font-size: 13px; line-height: 1.6; }
 .xg-banner-body b { color: #b91c1c; }
+.xg-banner-tip {
+    margin-top: 6px;
+    font-size: 12px;
+    line-height: 1.6;
+    color: #92400e;
+    background: rgba(240, 185, 11, .16);
+    border-radius: 8px;
+    padding: 6px 8px;
+}
 .xg-banner-btn {
     margin-top: 10px;
     width: 100%;
@@ -91,19 +100,16 @@
     cursor: pointer;
 }
 
-.xg-mock {
+.xg-shot {
+    display: block;
+    width: 100%;
+    max-width: 320px;
     margin-top: 10px;
-    border: 1px dashed #d1d5db;
     border-radius: 12px;
-    padding: 10px 12px;
-    background: #fafafa;
+    background: #1e2329;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, .12);
 }
-.xg-mock-title { font-size: 11px; color: var(--color-text-muted); margin-bottom: 6px; }
-.xg-mock-row { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; padding: 3px 0; color: var(--color-text-secondary); }
-.xg-mock-row span:last-child { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--color-text-primary); }
-.xg-mock-receive { margin-top: 4px; padding: 6px 8px; border-radius: 8px; background: #e7f8ef; font-weight: 700; }
-.xg-mock-receive span { color: #047857 !important; }
-.xg-mock-ok { text-align: right; font-size: 11px; color: #047857; margin-top: 4px; }
+.xg-img-note { font-size: 12px; color: var(--color-text-muted); padding: 0 0 6px; }
 
 .xg-other { font-size: 12px; line-height: 1.6; color: var(--color-text-secondary); padding: 4px 0 10px; }
 .xg-modal-foot { padding: 12px 20px 18px; border-top: 1px solid var(--color-border); }
