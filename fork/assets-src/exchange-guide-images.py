@@ -1,6 +1,12 @@
+"""从三张币安提现截图生成教程配图（裁剪+标注+压缩）。
+用法: exchange-guide-images.py <填金额截图> <确认弹窗截图> <结果截图> <输出目录>
+"""
+import sys
 from PIL import Image, ImageDraw
 S = 1206 / 920  # 预览坐标 → 原图
-def src(n): return Image.open(f'/Users/metajs/Downloads/IMG_{n}.PNG').convert('RGB')
+SRC = dict(zip((4584, 4585, 4586), sys.argv[1:4]))
+OUT = sys.argv[4]
+def src(n): return Image.open(SRC[n]).convert('RGB')
 def box(y0, y1): return (0, round(y0 * S), 1206, round(y1 * S))
 RED, GREEN, BG = (255, 77, 79), (34, 197, 94), (30, 35, 41)
 
@@ -23,8 +29,7 @@ def ring(d, cx, cy, rad, c, w=6):
 
 def save(img, name, width=600):
     img = img.resize((width, round(img.height * width / img.width)), Image.LANCZOS)
-    img.save(f'{name}.webp', 'WEBP', quality=72, method=6)
-    img.save(f'{name}-preview.png')
+    img.save(f'{OUT}/{name}.webp', 'WEBP', quality=72, method=6)
 
 # 1) 填订单金额 → 到账数量少了手续费，点 ⇋
 a = src(4584)

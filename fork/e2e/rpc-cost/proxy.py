@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""计数 RPC 代理：转发 JSON-RPC 到上游节点，按方法记录调用次数 / NodeReal CU / 响应字节，
+"""计数 RPC 代理：转发 JSON-RPC 到上游节点，按方法记录调用次数 / CU 估算 / 响应字节，
 并记下 eth_getLogs 返回中命中目标钱包的 USDT 转账哈希（用于核对两个版本扫到的入账是否一致）。
 
 用法: proxy.py <listen_port> <upstream_url> <out_json> <wallet_lower> <contract_lower>
@@ -10,7 +10,7 @@ import threading
 import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
-# NodeReal BSC 计价（https://docs.nodereal.io/reference/compute-units）
+# CU 按常见 RPC 服务商的公开计价估算
 CU = {"eth_blockNumber": 5, "eth_getBlockByNumber": 15, "eth_getLogs": 50, "eth_getTransactionReceipt": 15}
 
 port, upstream, out, wallet, contract = int(sys.argv[1]), sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5]
