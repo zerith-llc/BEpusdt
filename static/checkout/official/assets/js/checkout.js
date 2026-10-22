@@ -687,6 +687,7 @@
         $('#qrcode').empty().qrcode({ text: paymentAddress, width: 200, height: 200 });
         updateQrPaymentLogo(currency, network);
         updateReselectButton();
+        if (window.ExchangeGuide) ExchangeGuide.mount({ tradeId: d.trade_id, amount: amount, currency: currency, network: network, netName: netName, address: paymentAddress }); // [FORK] exchange-guide
         bindHelp('helpBtnQ', d.support_url);
         Payment.initQrPage({
             expired_at: d.expired_at,

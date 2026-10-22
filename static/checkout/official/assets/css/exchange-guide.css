@@ -1,0 +1,120 @@
+/* [FORK] 交易所提币引导，见 assets/js/exchange-guide.js */
+#exchangeGuideMount { padding: 12px 24px 0; }
+#exchangeGuideMount:empty { display: none; }
+
+.xg-banner {
+    background: #fff7e6;
+    border: 1px solid #fcd34d;
+    border-radius: 14px;
+    padding: 12px 14px;
+    color: #78350f;
+}
+.xg-banner-title { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; color: #b45309; }
+.xg-banner-title svg { flex-shrink: 0; }
+.xg-banner-body { margin-top: 6px; font-size: 13px; line-height: 1.6; }
+.xg-banner-body b { color: #b91c1c; }
+.xg-banner-btn {
+    margin-top: 10px;
+    width: 100%;
+    border: 0;
+    border-radius: 10px;
+    padding: 10px 12px;
+    background: #f0b90b;
+    color: #1e2026;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+}
+.xg-banner-btn:hover { background: #f8d12f; }
+
+.xg-overlay { display: none; align-items: center; }
+.xg-modal-card { max-width: 460px; max-height: calc(100vh - 32px); display: flex; flex-direction: column; text-align: left; }
+.xg-modal-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 20px 12px;
+    border-bottom: 1px solid var(--color-border);
+}
+.xg-modal-head h2 { font-size: 18px; font-weight: 700; color: var(--color-text-primary); }
+.xg-close { border: 0; background: none; font-size: 26px; line-height: 1; color: var(--color-text-muted); cursor: pointer; padding: 0 4px; }
+.xg-modal-body { padding: 14px 20px 6px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.xg-lead { font-size: 14px; color: var(--color-text-secondary); margin-bottom: 12px; }
+
+.xg-steps { list-style: none; counter-reset: xg; }
+.xg-steps > li {
+    counter-increment: xg;
+    position: relative;
+    padding: 0 0 14px 34px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--color-text-primary);
+}
+.xg-steps > li::before {
+    content: counter(xg);
+    position: absolute;
+    left: 0;
+    top: 1px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #f0b90b;
+    color: #1e2026;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.xg-steps b { color: #b45309; }
+
+.xg-copy-row {
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--color-bg);
+    border-radius: 10px;
+    padding: 8px 8px 8px 12px;
+}
+.xg-copy-value { flex: 1; min-width: 0; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; font-weight: 600; word-break: break-all; }
+.xg-copy-value small { font-family: inherit; font-weight: 500; color: var(--color-text-secondary); }
+.xg-copy-btn {
+    flex-shrink: 0;
+    border: 0;
+    border-radius: 8px;
+    padding: 6px 12px;
+    background: var(--color-btn);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.xg-mock {
+    margin-top: 10px;
+    border: 1px dashed #d1d5db;
+    border-radius: 12px;
+    padding: 10px 12px;
+    background: #fafafa;
+}
+.xg-mock-title { font-size: 11px; color: var(--color-text-muted); margin-bottom: 6px; }
+.xg-mock-row { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; padding: 3px 0; color: var(--color-text-secondary); }
+.xg-mock-row span:last-child { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--color-text-primary); }
+.xg-mock-receive { margin-top: 4px; padding: 6px 8px; border-radius: 8px; background: #e7f8ef; font-weight: 700; }
+.xg-mock-receive span { color: #047857 !important; }
+.xg-mock-ok { text-align: right; font-size: 11px; color: #047857; margin-top: 4px; }
+
+.xg-other { font-size: 12px; line-height: 1.6; color: var(--color-text-secondary); padding: 4px 0 10px; }
+.xg-modal-foot { padding: 12px 20px 18px; border-top: 1px solid var(--color-border); }
+.xg-got-it {
+    width: 100%;
+    border: 0;
+    border-radius: var(--radius-btn);
+    padding: 12px;
+    background: var(--color-btn);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+}

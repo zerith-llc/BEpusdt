@@ -116,8 +116,9 @@ func (e *evm) syncBlocksForward(ctx context.Context) {
 		return
 	}
 
-	for from := lastBlockNumber + 1; from <= now; from += blockParseMaxNum {
-		to := from + blockParseMaxNum - 1
+	step := e.scanScope().batchSize()
+	for from := lastBlockNumber + 1; from <= now; from += step {
+		to := from + step - 1
 		if to > now {
 			to = now
 		}
@@ -142,7 +143,8 @@ func (e *evm) lookbackBlocks(ctx context.Context) {
 	}
 
 	start, end := blockapi.New().GetBoundaryHeights(startAt, endAt, e.Network)
-	for i := start; i <= end; i += blockParseMaxNum {
+	step := e.scanScope().batchSize()
+	for i := start; i <= end; i += step {
 		select {
 		case <-ctx.Done():
 			return
@@ -151,7 +153,7 @@ func (e *evm) lookbackBlocks(ctx context.Context) {
 		if syncBreak(e.Network, e.blockScanQueue.Len()) {
 			return
 		}
-		to := i + blockParseMaxNum - 1
+		to := i + step - 1
 		if to > end {
 			to = end
 		}
@@ -192,6 +194,49 @@ func (e *evm) getBlockByNumber(a any) {
 		return
 	}
 
+	scope := e.scanScope() // [FORK] evm-scan-scope
+	if scope.native && b.To-b.From+1 > blockParseMaxNum {
+		// 入队时按仅扫事件的大批次切分，之后出现了原生币订单：拉完整区块需要拆回小批次
+		for from := b.From; from <= b.To; from += blockParseMaxNum {
+			e.blockScanQueue.In <- evmBlock{From: from, To: min(from+blockParseMaxNum-1, b.To)}
+		}
+
+		return
+	}
+
+	nativeTransfers := make([]transfer, 0)
+	blockTimestamp := make(map[string]time.Time)
+	if scope.native {
+		var ok bool
+		if nativeTransfers, ok = e.parseNativeBlocks(b, blockTimestamp); !ok {
+
+			return
+		}
+	}
+
+	transfers, err := e.parseEventTransfer(b, blockTimestamp, scope)
+	if err != nil {
+		conf.RecordFailure(e.Network)
+		e.blockScanQueue.In <- b
+		log.Task.Warn("Evm Block Parse Error parsing block transfer:", err)
+
+		return
+	}
+
+	conf.RecordSuccess(e.Network, cast.ToString(b.To))
+
+	if len(nativeTransfers) > 0 {
+		transferQueue.In <- nativeTransfers
+	}
+	if len(transfers) > 0 {
+		transferQueue.In <- transfers
+	}
+
+	log.Task.Info(fmt.Sprintf("区块扫描完成(%s): %d → %d 成功率：%s", e.Network, b.From, b.To, conf.GetSuccessRate(e.Network)))
+}
+
+// parseNativeBlocks 拉取完整区块(含交易)解析原生币转账，同时记录区块时间；失败时已重新入队
+func (e *evm) parseNativeBlocks(b evmBlock, blockTimestamp map[string]time.Time) ([]transfer, bool) {
 	items := make([]string, 0)
 	for i := b.From; i <= b.To; i++ {
 		items = append(items, fmt.Sprintf(`{"jsonrpc":"2.0","method":"eth_getBlockByNumber","params":["0x%x",%t],"id":%d}`, i, e.Native.Parse, i))
@@ -204,7 +249,7 @@ func (e *evm) getBlockByNumber(a any) {
 	if err != nil {
 		log.Task.Warn("Error creating request:", err)
 
-		return
+		return nil, false
 	}
 
 	req.Header.Set("Content-Type", "application/json")
@@ -214,7 +259,7 @@ func (e *evm) getBlockByNumber(a any) {
 		e.blockScanQueue.In <- b
 		log.Task.Warn("eth_getBlockByNumber Error sending request:", err)
 
-		return
+		return nil, false
 	}
 
 	defer resp.Body.Close()
@@ -225,20 +270,17 @@ func (e *evm) getBlockByNumber(a any) {
 		e.blockScanQueue.In <- b
 		log.Task.Warn("eth_getBlockByNumber Error reading response body:", err)
 
-		return
+		return nil, false
 	}
 
-	conf.RecordSuccess(e.Network, cast.ToString(b.To))
-
 	nativeTransfers := make([]transfer, 0)
-	blockTimestamp := make(map[string]time.Time)
 	for _, itm := range gjson.ParseBytes(body).Array() {
 		if itm.Get("error").Exists() {
 			conf.RecordFailure(e.Network)
 			e.blockScanQueue.In <- b
 			log.Task.Warn(fmt.Sprintf("%s eth_getBlockByNumber response error %s", e.Network, itm.Get("error").String()))
 
-			return
+			return nil, false
 		}
 
 		timestamp := utils.HexStr2Int(itm.Get("result.timestamp").String()).Int64()
@@ -253,23 +295,7 @@ func (e *evm) getBlockByNumber(a any) {
 		}
 	}
 
-	transfers, err := e.parseEventTransfer(b, blockTimestamp)
-	if err != nil {
-		conf.RecordFailure(e.Network)
-		e.blockScanQueue.In <- b
-		log.Task.Warn("Evm Block Parse Error parsing block transfer:", err)
-
-		return
-	}
-
-	if len(nativeTransfers) > 0 {
-		transferQueue.In <- nativeTransfers
-	}
-	if len(transfers) > 0 {
-		transferQueue.In <- transfers
-	}
-
-	log.Task.Info(fmt.Sprintf("区块扫描完成(%s): %d → %d 成功率：%s", e.Network, b.From, b.To, conf.GetSuccessRate(e.Network)))
+	return nativeTransfers, true
 }
 
 func (e *evm) parseNativeTransfer(array []gjson.Result, num int, timestamp time.Time) []transfer {
@@ -315,9 +341,14 @@ func (e *evm) parseNativeTransfer(array []gjson.Result, num int, timestamp time.
 	return nativeTransfers
 }
 
-func (e *evm) parseEventTransfer(b evmBlock, timestamp map[string]time.Time) ([]transfer, error) {
+func (e *evm) parseEventTransfer(b evmBlock, timestamp map[string]time.Time, scope evmScanScope) ([]transfer, error) {
 	transfers := make([]transfer, 0)
-	post := []byte(fmt.Sprintf(`{"jsonrpc":"2.0","method":"eth_getLogs","params":[{"fromBlock":"0x%x","toBlock":"0x%x","topics":["%s"]}],"id":1}`, b.From, b.To, evmTransferEvent))
+	if !scope.logs {
+
+		return transfers, nil
+	}
+
+	post := []byte(fmt.Sprintf(`{"jsonrpc":"2.0","method":"eth_getLogs","params":[%s],"id":1}`, scope.logsFilter(b)))
 	resp, err := e.Client.Post(e.rpcEndpoint(), "application/json", bytes.NewBuffer(post))
 	if err != nil {
 
@@ -338,6 +369,8 @@ func (e *evm) parseEventTransfer(b evmBlock, timestamp map[string]time.Time) ([]
 		return transfers, errors.New(fmt.Sprintf("%s eth_getLogs response error %s", e.Network, data.Get("error").String()))
 	}
 
+	var missing = make(map[string]struct{})
+	var blockNums = make([]string, 0)
 	for _, itm := range data.Get("result").Array() {
 		to := itm.Get("address").String()
 		tradeType, ok := model.GetContractTrade(to)
@@ -365,16 +398,45 @@ func (e *evm) parseEventTransfer(b evmBlock, timestamp map[string]time.Time) ([]
 			continue
 		}
 
+		blockNum := itm.Get("blockNumber").String()
+		if _, ok := timestamp[blockNum]; !ok {
+			if ts := itm.Get("blockTimestamp"); ts.Exists() {
+				timestamp[blockNum] = time.Unix(utils.HexStr2Int(ts.String()).Int64(), 0)
+			} else {
+				missing[blockNum] = struct{}{}
+			}
+		}
+
 		transfers = append(transfers, transfer{
 			Network:     e.Network,
 			FromAddress: from,
 			RecvAddress: recv,
 			Amount:      decimal.NewFromBigInt(amount, model.GetContractDecimal(to)),
 			TxHash:      itm.Get("transactionHash").String(),
-			BlockNum:    cast.ToInt(itm.Get("blockNumber").String()),
-			Timestamp:   timestamp[itm.Get("blockNumber").String()],
+			BlockNum:    cast.ToInt(blockNum),
 			TradeType:   tradeType,
 		})
+		blockNums = append(blockNums, blockNum)
+	}
+
+	if len(missing) > 0 {
+		nums := make([]string, 0, len(missing))
+		for n := range missing {
+			nums = append(nums, n)
+		}
+
+		times, err := e.fetchBlockTimes(nums)
+		if err != nil {
+
+			return transfers, errors.Join(errors.New("eth_getBlockByNumber header Error"), err)
+		}
+		for n, t := range times {
+			timestamp[n] = t
+		}
+	}
+
+	for i := range transfers {
+		transfers[i].Timestamp = timestamp[blockNums[i]]
 	}
 
 	return transfers, nil
@@ -465,11 +527,7 @@ func syncBreak(network string, num int) bool {
 		return true
 	}
 
-	var count int64
-	model.Db.Model(&model.Wallet{}).
-		Where("other_notify = ? and trade_type in (?)", model.WaOtherEnable, trades).
-		Count(&count)
-	if count > 0 {
+	if hasOtherNotifyWallet(trades) {
 
 		return false
 	}
