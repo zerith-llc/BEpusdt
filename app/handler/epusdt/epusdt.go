@@ -10,6 +10,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/shopspring/decimal"
+	"github.com/v03413/bepusdt/app"
 	"github.com/v03413/bepusdt/app/log"
 	"github.com/v03413/bepusdt/app/model"
 	"github.com/v03413/bepusdt/app/utils"
@@ -354,7 +355,7 @@ func (Epusdt) Checkout(ctx *gin.Context) {
 	// 收银台模板
 	tmpl := model.GetC(model.PaymentCheckout) + "/checkout.html"
 
-	ctx.HTML(200, tmpl, gin.H{"trade_id": tradeId})
+	ctx.HTML(200, tmpl, gin.H{"trade_id": tradeId, "v": app.Version}) // [FORK] asset-version：静态资源带版本号，发版即失效 CDN/浏览器缓存
 }
 
 func (Epusdt) GetMethods(ctx *gin.Context) {

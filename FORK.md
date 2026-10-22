@@ -30,6 +30,11 @@
 - 上游按整数小时解析 `payment_lookback_hour`，最小只能 1 小时；填 `0.5` 会被解析成 0，等于关掉回溯。
 - 过期订单在回溯窗口内会持续扫块（用来接住晚到的付款），窗口越长 RPC 用量越大。改成按浮点数解析，可以设成 `0.5`（30 分钟）这类更短的窗口；整数配置行为不变。
 
+### asset-version：收银台静态资源带版本号
+
+- 文件：`app/handler/epusdt/epusdt.go`（模板变量 `v` = 构建版本），`static/checkout/official/views/checkout.html`
+- 静态资源文件名不变，CDN 和浏览器会按 `Cache-Control` 继续发旧文件，发版后新页面会拿到旧 js/css。给本地 css/js 加 `?v=<构建版本>`；收银台页面本身是动态路由，不会被缓存，所以每次发版资源 URL 都会变。
+
 ## 本地构建注意
 
 `static/secure/` 是后台前端构建产物（被 gitignore），只跑 Go 二进制时放一个占位 `static/secure/secure.html` 即可启动。
