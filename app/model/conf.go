@@ -258,8 +258,7 @@ func FillDefaultConf() {
 }
 
 func GetLookbackHour() time.Duration {
-	var hour = time.Hour * -1
-	var num = cast.ToInt(GetC(PaymentLookbackHour))
+	var num = cast.ToFloat64(GetC(PaymentLookbackHour)) // [FORK] fractional-lookback：支持小数小时，如 0.5 = 30 分钟
 
-	return time.Duration(num) * hour
+	return -time.Duration(num * float64(time.Hour))
 }

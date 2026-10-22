@@ -57,9 +57,9 @@
           <a-form-item
             field="payment_lookback_hour"
             label="订单回溯时间"
-            extra="扫块回溯时间，单位小时；可解决异常重启时导致的漏单问题"
+            extra="扫块回溯时间，单位小时，支持小数（如 0.5 = 30 分钟）；可解决异常重启时导致的漏单问题"
           >
-            <a-input v-model="form.payment_lookback_hour" placeholder="请输入正整数" />
+            <a-input v-model="form.payment_lookback_hour" placeholder="请输入正数" />
           </a-form-item>
 
           <a-form-item field="payment_match_mode" label="金额匹配模式">
@@ -183,8 +183,8 @@ const rules = {
     {
       validator: (value: string, callback: (error?: string) => void) => {
         const num = Number(value);
-        if (!Number.isInteger(num) || num <= 0) {
-          callback("订单回溯时间必须为正整数");
+        if (!Number.isFinite(num) || num <= 0) { // [FORK] fractional-lookback
+          callback("订单回溯时间必须为正数");
         } else {
           callback();
         }
