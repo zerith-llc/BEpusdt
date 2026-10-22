@@ -20,7 +20,7 @@
 
 - 文件：`static/checkout/official/assets/{js,css}/exchange-guide.*`，接线在 `views/checkout.html`、`assets/js/checkout.js`
 - 网关是精确金额匹配，交易所提币会从提现数量里扣手续费导致少到账。付款页加醒目提示 + 币安提币分步教程
-  （每个订单首次进入自动弹出一次），带地址/金额复制；核心是「填订单金额 → 点到账数量 ⇋ → 确认」，配三张裁剪标注过的
+  （点横幅按钮弹出，不自动弹），带地址/金额复制；核心是「填订单金额 → 点到账数量 ⇋ → 确认」，配三张裁剪标注过的
   币安截图（`assets/img/exchange-guide/*.webp`，由 `fork/assets-src/exchange-guide-images.py` 从原图生成，原图不入库）。
 - 验证：`fork/e2e/checkout-guide/shot.py <base_url> <trade_id> <out_dir>`（`CHROME_PATH` 可指定本机 Chrome）。
 
