@@ -37,4 +37,6 @@
 
 ## 本地构建注意
 
+工具链（go / node / pnpm）由根目录 `mise.toml` 声明，clone 后 `mise install` 装齐；版本出处见文件内注释。
+
 `static/secure/` 是后台前端构建产物（被 gitignore），只跑 Go 二进制时放一个占位 `static/secure/secure.html` 即可启动。
