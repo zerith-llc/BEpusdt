@@ -1,0 +1,9 @@
+# 本仓库的工具链声明：clone 后 `mise install` 即可装齐构建所需的运行时。
+[tools]
+# go.mod `go 1.26.2`（dockerfile 的 golang:1.26.2 与 release.yml 的 setup-go 1.26.2 一致）
+go = "1.26"
+# web/ 后台前端构建用：web/package.json engines.node 只给了下限 >=20.19.0，
+# 取 dockerfile（node:25.2.1）和 release.yml（setup-node 25）实际构建用的大版本
+node = "25"
+# web/package.json engines.pnpm `>=10.0.0 <11`（dockerfile / release.yml 均装 pnpm@10）
+pnpm = "10"
